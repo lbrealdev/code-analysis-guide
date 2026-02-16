@@ -23,20 +23,20 @@ _cleanup_config_created="false"
 _cleanup_original_dir=""
 
 # cleanup() - Trap handler that runs on EXIT to ensure proper cleanup
-# Always returns to original directory and removes config file if we created it
+# Always removes config file if we created it (while still in target dir), then returns to original directory
 # This runs even if the script fails or exits early
 cleanup() {
   local exit_code=$?
   
-  # Return to original directory if we changed
-  if [ -n "$_cleanup_original_dir" ] && [ "$(pwd)" != "$_cleanup_original_dir" ]; then
-    cd "$_cleanup_original_dir" || true
-  fi
-  
-  # Clean up config file only if we created it (not user's existing config)
+  # Clean up config file FIRST (while still in target directory)
   if [ "$_cleanup_config_created" = "true" ] && [ -f "$TALLYMAN_CONFIG_FILE" ]; then
     rm "$TALLYMAN_CONFIG_FILE"
     echo "Cleaned up $TALLYMAN_CONFIG_FILE"
+  fi
+  
+  # THEN return to original directory
+  if [ -n "$_cleanup_original_dir" ] && [ "$(pwd)" != "$_cleanup_original_dir" ]; then
+    cd "$_cleanup_original_dir" || true
   fi
   
   return $exit_code
