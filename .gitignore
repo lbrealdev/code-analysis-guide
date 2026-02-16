@@ -1,0 +1,8 @@
+# IDEs and editors
+.idea/
+
+# Tallyman config
+.tally-config.toml
+
+# Generated reports
+reports/
