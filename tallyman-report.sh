@@ -5,6 +5,9 @@
 
 set -euo pipefail
 
+SCRIPT_NAME="$(basename "$0")"
+CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 TALLYMAN_CONFIG_FILE=".tally-config.toml"
 
 print_banner() {
