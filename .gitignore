@@ -3,3 +3,6 @@
 
 # Tallyman config
 .tally-config.toml
+
+# Generated reports
+reports/

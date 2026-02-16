@@ -5,10 +5,8 @@
 
 set -euo pipefail
 
-SCRIPT_NAME="$(basename "$0")"
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 TALLYMAN_CONFIG_FILE=".tally-config.toml"
+REPORTS_DIR="reports"
 
 print_banner() {
     echo ""
@@ -81,17 +79,29 @@ tallyman_report() {
   tallyman_install
   tallyman_config
 
+  # Create reports directory in original execution directory
+  if [ ! -d "${original_dir}/${REPORTS_DIR}" ]; then
+    mkdir -p "${original_dir}/${REPORTS_DIR}"
+    echo "Created ${REPORTS_DIR}/ directory"
+  fi
+
   # Generate the actual report
   local repo_name repo_branch
   repo_name=$(basename "$(git rev-parse --show-toplevel)")
   repo_branch=$(git branch --show-current)
 
-  tallyman --no-color > "${repo_name}_${repo_branch}_report.md"
+  tallyman --no-color > "${original_dir}/${REPORTS_DIR}/${repo_name}_${repo_branch}_report.md"
+
+  # Clean up config file if we created it
+  if [ -f "$TALLYMAN_CONFIG_FILE" ]; then
+    rm "$TALLYMAN_CONFIG_FILE"
+    echo "Cleaned up $TALLYMAN_CONFIG_FILE"
+  fi
 
   # Return to original directory
   cd "$original_dir"
 
-  echo "Report generated successfully"
+  echo "Report generated successfully: ${original_dir}/${REPORTS_DIR}/${repo_name}_${repo_branch}_report.md"
 }
 
 main() {
